@@ -1,4 +1,7 @@
-import { ComponentSlotStylesResolved, ComponentVariablesObject, isDebugEnabled } from '@fluentui/styles';
+import createCache from '@emotion/cache';
+import { serializeStyles } from '@emotion/serialize';
+import { insertStyles } from '@emotion/utils';
+import { ComponentSlotStylesResolved, ComponentVariablesObject, ICSSInJSStyle, isDebugEnabled } from '@fluentui/styles';
 
 import * as _ from 'lodash';
 
@@ -11,6 +14,15 @@ export type GetStylesResult = {
   variables: ComponentVariablesObject;
   styles: ComponentSlotStylesResolved;
   theme: StylesContextValue['theme'];
+};
+
+const cache = createCache();
+
+const css = (args: ICSSInJSStyle) => {
+  const serialized = serializeStyles([args as any], cache.registered, undefined);
+  insertStyles(cache, serialized, true);
+
+  return `${cache.key}-${serialized.name}`;
 };
 
 const getStyles = (options: ResolveStylesOptions): GetStylesResult => {
@@ -35,7 +47,7 @@ const getStyles = (options: ResolveStylesOptions): GetStylesResult => {
     telemetry.performance[primaryDisplayName].msResolveVariablesTotal += performance.now() - telemetryPartStart;
   }
 
-  const { classes, resolvedStyles, resolvedStylesDebug } = resolveStyles(options, resolvedVariables);
+  const { classes, resolvedStyles, resolvedStylesDebug } = resolveStyles(options, resolvedVariables, css);
 
   // conditionally add sources for evaluating debug information to component
   if (process.env.NODE_ENV !== 'production' && isDebugEnabled) {

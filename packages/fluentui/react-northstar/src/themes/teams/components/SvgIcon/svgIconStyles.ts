@@ -83,7 +83,7 @@ const svgIconStyles: ComponentSlotStylesPrepared<SvgIconStylesProps, SvgIconVari
     };
   },
 
-  svg: ({ props: { size, disabled, rotate }, variables: v }): ICSSInJSStyle => {
+  svg: ({ props: { size, disabled, rotate }, variables: v, rtl }): ICSSInJSStyle => {
     const iconSizeInRems = getIconSize(size, v);
 
     return {
@@ -97,6 +97,9 @@ const svgIconStyles: ComponentSlotStylesPrepared<SvgIconStylesProps, SvgIconVari
       }),
 
       transform: `rotate(${rotate}deg)`,
+      ...(rtl && {
+        transform: `rotate(${-1 * rotate}deg)`,
+      }),
     };
   },
 
@@ -105,7 +108,7 @@ const svgIconStyles: ComponentSlotStylesPrepared<SvgIconStylesProps, SvgIconVari
     return {
       ...callable(svgIconStyles.svg)(config),
       ...(rtl && {
-        transform: `scaleX(-1) rotate(${-1 * props.rotate}deg)`,
+        transform: `scaleX(-1) rotate(${props.rotate}deg)`,
       }),
     };
   },

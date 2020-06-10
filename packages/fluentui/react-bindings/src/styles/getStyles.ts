@@ -43,12 +43,10 @@ const focusVisiblePluginStylis: StylisPlugin = (context, content, selectors) => 
 
 const cache = createCache({
   stylisPlugins: [focusVisiblePluginStylis],
-  speedy: true,
 });
 const cacheRtl = createCache({
   key: 'rcss',
   stylisPlugins: [focusVisiblePluginStylis, rtlPlugin],
-  speedy: true,
 });
 
 const css = (args: ICSSInJSStyle) => {

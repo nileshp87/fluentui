@@ -43,13 +43,17 @@ const focusVisiblePluginStylis: StylisPlugin = (context, content, selectors) => 
 
 const cache = createCache({
   stylisPlugins: [focusVisiblePluginStylis],
+  speedy: true,
 });
 const cacheRtl = createCache({
   key: 'rcss',
   stylisPlugins: [focusVisiblePluginStylis, rtlPlugin],
+  speedy: true,
 });
 
 const css = (args: ICSSInJSStyle) => {
+  if (Object.keys(args).length === 0) return '';
+
   const serialized = serializeStyles([args as any], cache.registered, undefined);
   insertStyles(cache, serialized, true);
 
@@ -57,6 +61,8 @@ const css = (args: ICSSInJSStyle) => {
 };
 
 const rtlCss = (args: ICSSInJSStyle) => {
+  if (Object.keys(args).length === 0) return '';
+
   const serialized = serializeStyles([args as any], cacheRtl.registered, undefined);
   insertStyles(cacheRtl, serialized, true);
 

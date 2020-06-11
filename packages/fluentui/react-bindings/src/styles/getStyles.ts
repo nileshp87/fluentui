@@ -58,6 +58,22 @@ const css = (args: ICSSInJSStyle) => {
   return `${cache.key}-${serialized.name}`;
 };
 
+export const keyframes = (keyframe): object => {
+  const insertable = serializeStyles([keyframe as any], cache.registered, undefined);
+
+  const name = `animation-${insertable.name}`;
+  const styles = `@keyframes ${name}{${insertable.styles}}`;
+
+  return {
+    name,
+    styles,
+    anim: 1,
+    toString() {
+      return `_EMO_${name}_${styles}_EMO_`;
+    },
+  };
+};
+
 const rtlCss = (args: ICSSInJSStyle) => {
   if (Object.keys(args).length === 0) return '';
 

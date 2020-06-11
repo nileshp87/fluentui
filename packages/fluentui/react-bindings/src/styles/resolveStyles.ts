@@ -1,5 +1,6 @@
 import cx from 'classnames';
 import {
+  callable,
   ComponentSlotStylesInput,
   ComponentSlotStylesPrepared,
   ComponentSlotStylesResolved,
@@ -13,6 +14,7 @@ import {
 } from '@fluentui/styles';
 import { ComponentSlotClasses, RendererParam, ResolveStylesOptions } from './types';
 import * as _ from 'lodash';
+import { keyframes } from './getStyles';
 
 export type ResolveStylesResult = {
   resolvedStyles: ComponentSlotStylesResolved;
@@ -25,6 +27,32 @@ const classesCache = new WeakMap<ThemePrepared, Record<string, string>>();
 
 // this weak map is used as cache for the styles
 const stylesCache = new WeakMap<ThemePrepared, Record<string, ICSSInJSStyle>>();
+
+const invokeKeyframes = (styles: ICSSInJSStyle): ICSSInJSStyle => {
+  return Object.keys(styles).reduce((acc, cssPropertyName) => {
+    const cssPropertyValue = styles[cssPropertyName];
+
+    if (_.isPlainObject(cssPropertyValue)) {
+      if (cssPropertyName === 'animationName') {
+        if (cssPropertyValue.keyframe) {
+          styles[cssPropertyName] = keyframes(callable(cssPropertyValue.keyframe)(cssPropertyValue.params || {}));
+        }
+
+        return {
+          ...acc,
+          [cssPropertyName]: styles[cssPropertyName],
+        };
+      }
+
+      return {
+        ...acc,
+        [cssPropertyName]: invokeKeyframes(cssPropertyValue),
+      };
+    }
+
+    return { ...acc, [cssPropertyName]: styles[cssPropertyName] };
+  }, {});
+};
 
 /**
  * Both resolvedStyles and classes are objects of getters with lazy evaluation
@@ -190,7 +218,7 @@ const resolveStyles = (
         const telemetryPartStart = telemetry?.enabled ? performance.now() : 0;
 
         // resolve/render slot styles once and cache
-        resolvedStyles[lazyEvaluationKey] = mergedStyles[slotName](styleParam);
+        resolvedStyles[lazyEvaluationKey] = invokeKeyframes(mergedStyles[slotName](styleParam));
 
         if (cacheEnabled && theme) {
           stylesCache.set(theme, {
@@ -261,7 +289,7 @@ const resolveStyles = (
         // this resolves the getter magic
         const styleObj = resolvedStyles[slotName];
         const telemetryPartStart = telemetry?.enabled ? performance.now() : 0;
-
+        console.log(styleObj);
         if (renderStyles && styleObj) {
           classes[lazyEvaluationKey] = renderStyles(styleObj);
 

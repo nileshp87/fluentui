@@ -1,9 +1,11 @@
-import { Renderer } from '@fluentui/react-bindings';
-import { createRenderer as createFelaRenderer } from 'fela';
+import { Renderer, RendererParam } from '@fluentui/react-bindings';
+import { createRenderer as createFelaRenderer, IStyle } from 'fela';
 import felaPluginEmbedded from 'fela-plugin-embedded';
 import felaPluginFallbackValue from 'fela-plugin-fallback-value';
 import felaPluginPlaceholderPrefixer from 'fela-plugin-placeholder-prefixer';
 import felaPluginRtl from 'fela-plugin-rtl';
+import * as React from 'react';
+import { RendererProvider } from 'react-fela';
 
 import felaDisableAnimationsPlugin from './felaDisableAnimationsPlugin';
 import felaExpandCssShorthandsPlugin from './felaExpandCssShorthandsPlugin';
@@ -12,6 +14,7 @@ import felaInvokeKeyframesPlugin from './felaInvokeKeyframesPlugin';
 import felaPerformanceEnhancer from './felaPerformanceEnhancer';
 import felaSanitizeCss from './felaSanitizeCssPlugin';
 import felaStylisEnhancer from './felaStylisEnhancer';
+import { createEmotionRenderer } from 'src/utils/emotionRender';
 
 let felaDevMode = false;
 
@@ -77,6 +80,35 @@ const rendererConfig = {
   ],
 };
 
-export const createRenderer = (): Renderer => createFelaRenderer(rendererConfig) as Renderer;
+type FelaRendererParam = Omit<RendererParam, 'RendererParam'> & { theme: { direction: 'rtl' | 'ltr' } };
 
-export const felaRenderer = createRenderer();
+export const createRenderer = (target: Document): Renderer => {
+  const felaRenderer = createFelaRenderer(rendererConfig);
+
+  // rehydration disabled to avoid leaking styles between renderers
+  // https://github.com/rofrischmann/fela/blob/master/docs/api/fela-dom/rehydrate.md
+  const Provider: React.FC = props => (
+    <RendererProvider renderer={felaRenderer} {...{ rehydrate: false, targetDocument: target }}>
+      {props.children}
+    </RendererProvider>
+  );
+
+  return {
+    renderFont: font => {
+      felaRenderer.renderFont(font.name, font.paths, font.props);
+    },
+    renderGlobal: felaRenderer.renderStatic,
+    renderRule: (styles, param) => {
+      const felaParam: FelaRendererParam = {
+        ...param,
+        theme: { direction: param.direction },
+      };
+
+      return felaRenderer.renderRule(() => (styles as unknown) as IStyle, felaParam);
+    },
+
+    Provider,
+  };
+};
+
+export const felaRenderer = createEmotionRenderer(document); // createRenderer(document);

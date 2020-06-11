@@ -26,7 +26,7 @@ function Design<DesignProps>({ config, children }) {
   const styleParam: RendererParam = {
     displayName: Design.displayName,
     disableAnimations: context.disableAnimations,
-    theme: { direction: context.rtl ? 'rtl' : 'ltr' },
+    direction: context.rtl ? 'rtl' : 'ltr',
     sanitizeCss: context.performance.enableSanitizeCssPlugin,
   };
 

@@ -1,4 +1,3 @@
-import { IStyle } from 'fela';
 import * as _ from 'lodash';
 import {
   getElementType,
@@ -51,7 +50,7 @@ const renderFontFaces = (renderer: Renderer, theme: ThemeInput) => {
       throw new Error(`fontFaces must be objects, got: ${typeof font}`);
     }
 
-    renderer.renderFont(font.name, font.paths, font.props);
+    renderer.renderFont(font);
   };
 
   theme.fontFaces.forEach((font: FontFace) => {
@@ -66,13 +65,13 @@ const renderStaticStyles = (renderer: Renderer, theme: ThemeInput, siteVariables
 
   const renderObject = (object: StaticStyleObject) => {
     _.forEach(object, (style, selector) => {
-      renderer.renderStatic(style as IStyle, selector);
+      renderer.renderGlobal(style, selector);
     });
   };
 
   theme.staticStyles.forEach((staticStyle: StaticStyle) => {
     if (typeof staticStyle === 'string') {
-      renderer.renderStatic(staticStyle);
+      renderer.renderGlobal(staticStyle);
     } else if (_.isPlainObject(staticStyle)) {
       renderObject(staticStyle as StaticStyleObject);
     } else if (_.isFunction(staticStyle)) {
@@ -181,20 +180,16 @@ const Provider: React.FC<WithAsProp<ProviderProps>> & {
           ...rtlProps,
           ...unhandledProps,
         };
+  const RenderProvider = outgoingContext.renderer.Provider;
 
-  // rehydration disabled to avoid leaking styles between renderers
-  // https://github.com/rofrischmann/fela/blob/master/docs/api/fela-dom/rehydrate.md
   return (
-    <RendererProvider
-      renderer={outgoingContext.renderer}
-      {...{ rehydrate: false, targetDocument: outgoingContext.target }}
-    >
+    <RenderProvider>
       <ThemeProvider theme={outgoingContext} overwrite>
         <PortalBoxContext.Provider value={element}>
           <ElementType {...elementProps}>{children}</ElementType>
         </PortalBoxContext.Provider>
       </ThemeProvider>
-    </RendererProvider>
+    </RenderProvider>
   );
 };
 

@@ -27,7 +27,7 @@ export const mergeRenderers = (current: Renderer, next?: Renderer, target?: Docu
     return registeredRenderers.get(target);
   }
 
-  const createdRenderer = createRenderer();
+  const createdRenderer = createRenderer(target);
   registeredRenderers.set(target, createdRenderer);
 
   return createdRenderer;

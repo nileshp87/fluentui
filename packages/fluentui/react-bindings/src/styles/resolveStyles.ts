@@ -1,6 +1,4 @@
-import cx from 'classnames';
 import {
-  callable,
   ComponentSlotStylesInput,
   ComponentSlotStylesPrepared,
   ComponentSlotStylesResolved,
@@ -12,9 +10,11 @@ import {
   ThemePrepared,
   withDebugId,
 } from '@fluentui/styles';
-import { ComponentSlotClasses, RendererParam, ResolveStylesOptions } from './types';
+import cx from 'classnames';
 import * as _ from 'lodash';
-import { keyframes } from './getStyles';
+
+import { RendererParam } from '../renderer/types';
+import { ComponentSlotClasses, ResolveStylesOptions } from './types';
 
 export type ResolveStylesResult = {
   resolvedStyles: ComponentSlotStylesResolved;
@@ -28,31 +28,31 @@ const classesCache = new WeakMap<ThemePrepared, Record<string, string>>();
 // this weak map is used as cache for the styles
 const stylesCache = new WeakMap<ThemePrepared, Record<string, ICSSInJSStyle>>();
 
-const invokeKeyframes = (styles: ICSSInJSStyle): ICSSInJSStyle => {
-  return Object.keys(styles).reduce((acc, cssPropertyName) => {
-    const cssPropertyValue = styles[cssPropertyName];
-
-    if (_.isPlainObject(cssPropertyValue)) {
-      if (cssPropertyName === 'animationName') {
-        if (cssPropertyValue.keyframe) {
-          styles[cssPropertyName] = keyframes(callable(cssPropertyValue.keyframe)(cssPropertyValue.params || {}));
-        }
-
-        return {
-          ...acc,
-          [cssPropertyName]: styles[cssPropertyName],
-        };
-      }
-
-      return {
-        ...acc,
-        [cssPropertyName]: invokeKeyframes(cssPropertyValue),
-      };
-    }
-
-    return { ...acc, [cssPropertyName]: styles[cssPropertyName] };
-  }, {});
-};
+// const invokeKeyframes = (styles: ICSSInJSStyle): ICSSInJSStyle => {
+//   return Object.keys(styles).reduce((acc, cssPropertyName) => {
+//     const cssPropertyValue = styles[cssPropertyName];
+//
+//     if (_.isPlainObject(cssPropertyValue)) {
+//       if (cssPropertyName === 'animationName') {
+//         if (cssPropertyValue.keyframe) {
+//           styles[cssPropertyName] = keyframes(callable(cssPropertyValue.keyframe)(cssPropertyValue.params || {}));
+//         }
+//
+//         return {
+//           ...acc,
+//           [cssPropertyName]: styles[cssPropertyName],
+//         };
+//       }
+//
+//       return {
+//         ...acc,
+//         [cssPropertyName]: invokeKeyframes(cssPropertyValue),
+//       };
+//     }
+//
+//     return { ...acc, [cssPropertyName]: styles[cssPropertyName] };
+//   }, {});
+// };
 
 /**
  * Both resolvedStyles and classes are objects of getters with lazy evaluation
@@ -69,7 +69,6 @@ const invokeKeyframes = (styles: ICSSInJSStyle): ICSSInJSStyle => {
 const resolveStyles = (
   options: ResolveStylesOptions,
   resolvedVariables: ComponentVariablesObject,
-  renderStylesInput?: (styles: ICSSInJSStyle) => string,
 ): ResolveStylesResult => {
   const {
     allDisplayNames,
@@ -152,14 +151,12 @@ const resolveStyles = (
   // Our API should be aligned with it
   // Heads Up! Keep in sync with Design.tsx render logic
   const direction = rtl ? 'rtl' : 'ltr';
-  const felaParam: RendererParam = {
-    theme: { direction },
+  const rendererParam: RendererParam = {
+    direction,
     disableAnimations,
     displayName: allDisplayNames.join(':'), // does not affect styles, only used by useEnhancedRenderer in docs
     sanitizeCss: performanceFlags.enableSanitizeCssPlugin,
   };
-
-  const renderStyles = renderStylesInput || ((style: ICSSInJSStyle) => renderer.renderRule(() => style, felaParam));
 
   const resolvedStyles: Record<string, ICSSInJSStyle> = {};
   const resolvedStylesDebug: Record<string, { styles: Object }[]> = {};
@@ -218,7 +215,7 @@ const resolveStyles = (
         const telemetryPartStart = telemetry?.enabled ? performance.now() : 0;
 
         // resolve/render slot styles once and cache
-        resolvedStyles[lazyEvaluationKey] = invokeKeyframes(mergedStyles[slotName](styleParam));
+        resolvedStyles[lazyEvaluationKey] = mergedStyles[slotName](styleParam);
 
         if (cacheEnabled && theme) {
           stylesCache.set(theme, {
@@ -289,9 +286,9 @@ const resolveStyles = (
         // this resolves the getter magic
         const styleObj = resolvedStyles[slotName];
         const telemetryPartStart = telemetry?.enabled ? performance.now() : 0;
-        console.log(styleObj);
-        if (renderStyles && styleObj) {
-          classes[lazyEvaluationKey] = renderStyles(styleObj);
+
+        if (styleObj) {
+          classes[lazyEvaluationKey] = renderer.renderRule(styleObj, rendererParam);
 
           if (cacheEnabled && theme) {
             classesCache.set(theme, {

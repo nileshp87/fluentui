@@ -1,11 +1,7 @@
-import createCache from '@emotion/cache';
-import { serializeStyles } from '@emotion/serialize';
-import { Plugin as StylisPlugin } from '@emotion/stylis';
-import { insertStyles } from '@emotion/utils';
-import { ComponentSlotStylesResolved, ComponentVariablesObject, ICSSInJSStyle, isDebugEnabled } from '@fluentui/styles';
+import { ComponentSlotStylesResolved, ComponentVariablesObject, isDebugEnabled } from '@fluentui/styles';
 import * as _ from 'lodash';
 // @ts-ignore
-import rtlPlugin from 'stylis-plugin-rtl';
+// import rtlPlugin from 'stylis-plugin-rtl';
 
 import { ComponentSlotClasses, ResolveStylesOptions, StylesContextValue } from '../styles/types';
 import resolveVariables from './resolveVariables';
@@ -18,73 +14,73 @@ export type GetStylesResult = {
   theme: StylesContextValue['theme'];
 };
 
-const notFocusVisibleRgxp = /:not\(:focus-visible\)/g;
-const focusVisibleRgxp = /:focus-visible/g;
+// const notFocusVisibleRgxp = /:not\(:focus-visible\)/g;
+// const focusVisibleRgxp = /:focus-visible/g;
+//
+// const trim = (selector: string) => selector.trim().replace(/\s+/g, ' ');
+//
+// const focusVisiblePluginStylis: StylisPlugin = (context, content, selectors) => {
+//   if (context === 2) {
+//     selectors.forEach((selector, index) => {
+//       if (selector.indexOf(':focus-visible') !== -1) {
+//         if (selector.match(notFocusVisibleRgxp)) {
+//           const cleanSelector = selector.replace(notFocusVisibleRgxp, ':focus');
+//           selectors[index] = trim(`[data-whatinput]:not([data-whatinput="keyboard"]) ${cleanSelector}`);
+//         } else if (selector.match(focusVisibleRgxp)) {
+//           const cleanSelector = selector.replace(focusVisibleRgxp, ':focus');
+//           selectors[index] = trim(`[data-whatinput="keyboard"] ${cleanSelector}`);
+//         }
+//       }
+//     });
+//   }
+//
+//   return content;
+// };
+//
+// const cache = createCache({
+//   stylisPlugins: [focusVisiblePluginStylis],
+// });
+// const cacheRtl = createCache({
+//   key: 'rcss',
+//   stylisPlugins: [focusVisiblePluginStylis, rtlPlugin],
+// });
+//
+// const css = (args: ICSSInJSStyle) => {
+//   if (Object.keys(args).length === 0) return '';
+//
+//   const serialized = serializeStyles([args as any], cache.registered, undefined);
+//   insertStyles(cache, serialized, true);
+//
+//   return `${cache.key}-${serialized.name}`;
+// };
 
-const trim = (selector: string) => selector.trim().replace(/\s+/g, ' ');
-
-const focusVisiblePluginStylis: StylisPlugin = (context, content, selectors) => {
-  if (context === 2) {
-    selectors.forEach((selector, index) => {
-      if (selector.indexOf(':focus-visible') !== -1) {
-        if (selector.match(notFocusVisibleRgxp)) {
-          const cleanSelector = selector.replace(notFocusVisibleRgxp, ':focus');
-          selectors[index] = trim(`[data-whatinput]:not([data-whatinput="keyboard"]) ${cleanSelector}`);
-        } else if (selector.match(focusVisibleRgxp)) {
-          const cleanSelector = selector.replace(focusVisibleRgxp, ':focus');
-          selectors[index] = trim(`[data-whatinput="keyboard"] ${cleanSelector}`);
-        }
-      }
-    });
-  }
-
-  return content;
-};
-
-const cache = createCache({
-  stylisPlugins: [focusVisiblePluginStylis],
-});
-const cacheRtl = createCache({
-  key: 'rcss',
-  stylisPlugins: [focusVisiblePluginStylis, rtlPlugin],
-});
-
-const css = (args: ICSSInJSStyle) => {
-  if (Object.keys(args).length === 0) return '';
-
-  const serialized = serializeStyles([args as any], cache.registered, undefined);
-  insertStyles(cache, serialized, true);
-
-  return `${cache.key}-${serialized.name}`;
-};
-
-export const keyframes = (keyframe): object => {
-  const insertable = serializeStyles([keyframe as any], cache.registered, undefined);
-
-  const name = `animation-${insertable.name}`;
-  const styles = `@keyframes ${name}{${insertable.styles}}`;
-
-  return {
-    name,
-    styles,
-    anim: 1,
-    toString() {
-      return `_EMO_${name}_${styles}_EMO_`;
-    },
-  };
-};
-
-const rtlCss = (args: ICSSInJSStyle) => {
-  if (Object.keys(args).length === 0) return '';
-
-  const serialized = serializeStyles([args as any], cacheRtl.registered, undefined);
-  insertStyles(cacheRtl, serialized, true);
-
-  return `${cacheRtl.key}-${serialized.name}`;
-};
+// export const keyframes = (keyframe: any): object => {
+//   const insertable = serializeStyles([keyframe as any], cache.registered, undefined);
+//
+//   const name = `animation-${insertable.name}`;
+//   const styles = `@keyframes ${name}{${insertable.styles}}`;
+//
+//   return {
+//     name,
+//     styles,
+//     anim: 1,
+//     toString() {
+//       return `_EMO_${name}_${styles}_EMO_`;
+//     },
+//   };
+// };
+//
+// const rtlCss = (args: ICSSInJSStyle) => {
+//   if (Object.keys(args).length === 0) return '';
+//
+//   const serialized = serializeStyles([args as any], cacheRtl.registered, undefined);
+//   insertStyles(cacheRtl, serialized, true);
+//
+//   return `${cacheRtl.key}-${serialized.name}`;
+// };
 
 const getStyles = (options: ResolveStylesOptions): GetStylesResult => {
-  const { primaryDisplayName, telemetry, rtl } = options;
+  const { primaryDisplayName, telemetry } = options;
 
   //
   // To compute styles we are going through three stages:
@@ -108,7 +104,7 @@ const getStyles = (options: ResolveStylesOptions): GetStylesResult => {
   const { classes, resolvedStyles, resolvedStylesDebug } = resolveStyles(
     options,
     resolvedVariables,
-    rtl ? rtlCss : css,
+    // rtl ? rtlCss : css,
   );
 
   // conditionally add sources for evaluating debug information to component

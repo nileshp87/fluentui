@@ -9,8 +9,8 @@ import {
 import * as React from 'react';
 // @ts-ignore We have this export in package, but it is not present in typings
 import { ThemeContext } from 'react-fela';
+import { noopRenderer } from '@fluentui/styles';
 
-import { noopRenderer } from '../renderer/noopRenderer';
 import {
   ComponentDesignProp,
   ComponentSlotClasses,

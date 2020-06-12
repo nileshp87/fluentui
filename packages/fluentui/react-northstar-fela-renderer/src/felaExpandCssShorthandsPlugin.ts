@@ -1,6 +1,8 @@
 import { ICSSInJSStyle } from '@fluentui/styles';
 import * as CSS from 'csstype';
+// @ts-ignore
 import { expandProperty } from 'inline-style-expand-shorthand';
+import { TPlugin } from 'fela';
 
 // https://jsperf.com/array-indexof-vs-object-key-lookup2/12
 const handledCssProps: Partial<Record<keyof CSS.Properties, true>> = {
@@ -21,7 +23,7 @@ const handledCssProps: Partial<Record<keyof CSS.Properties, true>> = {
 };
 
 export default () => {
-  const expandCssShorthands = (styles: ICSSInJSStyle) => {
+  const expandCssShorthands = (styles: ICSSInJSStyle): ICSSInJSStyle => {
     return Object.keys(styles).reduce((acc: ICSSInJSStyle, cssPropertyName: keyof CSS.Properties) => {
       const cssPropertyValue = styles[cssPropertyName];
 
@@ -49,5 +51,5 @@ export default () => {
     }, {});
   };
 
-  return expandCssShorthands;
+  return expandCssShorthands as TPlugin;
 };

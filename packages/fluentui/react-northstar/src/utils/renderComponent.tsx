@@ -8,10 +8,10 @@ import {
   ReactAccessibilityBehavior,
   unstable_getAccessibility as getAccessibility,
   unstable_getStyles as getStyles,
-  noopRenderer,
 } from '@fluentui/react-bindings';
 import {
   emptyTheme,
+  noopRenderer,
   ComponentSlotStylesResolved,
   ComponentVariablesObject,
   DebugData,

@@ -1,5 +1,5 @@
-import { Renderer, RendererParam } from '@fluentui/react-bindings';
-import { createRenderer as createFelaRenderer, IStyle } from 'fela';
+import { CreateRenderer, RendererParam } from '@fluentui/styles';
+import { createRenderer, IStyle } from 'fela';
 import felaPluginEmbedded from 'fela-plugin-embedded';
 import felaPluginFallbackValue from 'fela-plugin-fallback-value';
 import felaPluginPlaceholderPrefixer from 'fela-plugin-placeholder-prefixer';
@@ -14,7 +14,6 @@ import felaInvokeKeyframesPlugin from './felaInvokeKeyframesPlugin';
 import felaPerformanceEnhancer from './felaPerformanceEnhancer';
 import felaSanitizeCss from './felaSanitizeCssPlugin';
 import felaStylisEnhancer from './felaStylisEnhancer';
-import { createEmotionRenderer } from 'src/utils/emotionRender';
 
 let felaDevMode = false;
 
@@ -82,8 +81,8 @@ const rendererConfig = {
 
 type FelaRendererParam = Omit<RendererParam, 'RendererParam'> & { theme: { direction: 'rtl' | 'ltr' } };
 
-export const createRenderer = (target: Document): Renderer => {
-  const felaRenderer = createFelaRenderer(rendererConfig);
+export const createFelaRenderer: CreateRenderer = target => {
+  const felaRenderer = createRenderer(rendererConfig);
 
   // rehydration disabled to avoid leaking styles between renderers
   // https://github.com/rofrischmann/fela/blob/master/docs/api/fela-dom/rehydrate.md
@@ -110,5 +109,3 @@ export const createRenderer = (target: Document): Renderer => {
     Provider,
   };
 };
-
-export const felaRenderer = createEmotionRenderer(document); // createRenderer(document);

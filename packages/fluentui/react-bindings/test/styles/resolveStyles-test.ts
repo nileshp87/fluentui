@@ -5,13 +5,10 @@ import {
   emptyTheme,
   ICSSInJSStyle,
   ThemePrepared,
-} from '@fluentui/styles';
-import {
   RendererRenderRule,
-  ResolveStylesOptions,
-  StylesContextPerformance,
   noopRenderer,
-} from '@fluentui/react-bindings';
+} from '@fluentui/styles';
+import { ResolveStylesOptions, StylesContextPerformance } from '@fluentui/react-bindings';
 
 import resolveStyles from '../../src/styles/resolveStyles';
 

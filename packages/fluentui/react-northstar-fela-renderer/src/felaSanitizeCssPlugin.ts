@@ -1,6 +1,6 @@
-import { ICSSInJSStyle } from '@fluentui/styles';
-import { Renderer, RendererParam } from '@fluentui/react-bindings';
+import { ICSSInJSStyle, Renderer, RendererParam } from '@fluentui/styles';
 import { TRuleType } from 'fela-utils';
+import { TPlugin } from 'fela';
 
 /**
  * Checks whether provided CSS property value is safe for being rendered by Fela engine.
@@ -46,19 +46,19 @@ export default (config?: { skip?: string[] }) => {
     styles: ICSSInJSStyle,
     type: TRuleType,
     renderer: Renderer,
-    params: RendererParam,
-  ) => {
-    if (!params.sanitizeCss) {
+    props: RendererParam,
+  ): ICSSInJSStyle => {
+    if (!props.sanitizeCss) {
       return styles;
     }
 
-    const processedStyles = Array.isArray(styles) ? [] : {};
+    const processedStyles: any = Array.isArray(styles) ? [] : {};
 
-    Object.keys(styles).forEach(cssPropertyNameOrIndex => {
+    Object.keys(styles).forEach((cssPropertyNameOrIndex: keyof ICSSInJSStyle | number) => {
       const cssPropertyValue = styles[cssPropertyNameOrIndex];
 
       if (typeof cssPropertyValue === 'object') {
-        processedStyles[cssPropertyNameOrIndex] = sanitizeCssStyleObject(cssPropertyValue, type, renderer, params);
+        processedStyles[cssPropertyNameOrIndex] = sanitizeCssStyleObject(cssPropertyValue, type, renderer, props);
         return;
       }
 
@@ -82,5 +82,5 @@ export default (config?: { skip?: string[] }) => {
     return processedStyles;
   };
 
-  return sanitizeCssStyleObject;
+  return sanitizeCssStyleObject as TPlugin;
 };

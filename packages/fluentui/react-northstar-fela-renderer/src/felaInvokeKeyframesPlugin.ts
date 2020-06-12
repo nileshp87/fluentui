@@ -1,5 +1,6 @@
-import { callable } from '@fluentui/styles';
+import { callable, ICSSInJSStyle } from '@fluentui/styles';
 import * as _ from 'lodash';
+import { TPlugin } from 'fela';
 
 /**
  * Fela plugin for invoking keyframes with params. The keyframes, defined in the animationName prop,
@@ -9,7 +10,7 @@ import * as _ from 'lodash';
  * tree.
  */
 export default () => {
-  const invokeKeyframes = (styles: Object) => {
+  const invokeKeyframes = (styles: ICSSInJSStyle): ICSSInJSStyle => {
     return Object.keys(styles).reduce((acc, cssPropertyName) => {
       const cssPropertyValue = styles[cssPropertyName];
 
@@ -35,5 +36,5 @@ export default () => {
     }, {});
   };
 
-  return invokeKeyframes;
+  return invokeKeyframes as TPlugin;
 };

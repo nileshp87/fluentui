@@ -1,6 +1,11 @@
-import { DebugData, ICSSInJSStyle, PropsWithVarsAndStyles, ThemeInput, ThemePrepared } from '@fluentui/styles';
-
-import { Renderer } from '../renderer/types';
+import {
+  DebugData,
+  ICSSInJSStyle,
+  PropsWithVarsAndStyles,
+  ThemeInput,
+  ThemePrepared,
+  Renderer,
+} from '@fluentui/styles';
 import { Telemetry } from '../telemetry/types';
 
 // Notice:

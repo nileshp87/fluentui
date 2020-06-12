@@ -2,8 +2,8 @@ import * as _ from 'lodash';
 import {
   getElementType,
   useUnhandledProps,
-  Renderer,
   StylesContextPerformanceInput,
+  RendererContext,
   Telemetry,
   unstable_getStyles,
   useIsomorphicLayoutEffect,
@@ -15,12 +15,13 @@ import {
   StaticStyleFunction,
   FontFace,
   ThemeInput,
+  Renderer,
   SiteVariablesPrepared,
 } from '@fluentui/styles';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 // @ts-ignore
-import { RendererProvider, ThemeProvider, ThemeContext } from 'react-fela';
+import { ThemeProvider, ThemeContext } from 'react-fela';
 
 import { ChildrenComponentProps, setUpWhatInput, tryCleanupWhatInput, UIComponentProps } from '../../utils';
 
@@ -30,7 +31,6 @@ import ProviderConsumer from './ProviderConsumer';
 import usePortalBox, { PortalBoxContext } from './usePortalBox';
 
 export interface ProviderProps extends ChildrenComponentProps, UIComponentProps {
-  renderer?: Renderer;
   rtl?: boolean;
   disableAnimations?: boolean;
   performance?: StylesContextPerformanceInput;
@@ -111,19 +111,19 @@ const Provider: React.FC<WithAsProp<ProviderProps>> & {
     return telemetryRef.current;
   }, [telemetryRef]);
   const inputContext: ProviderContextInput = {
-    theme: props.theme,
-    rtl: props.rtl,
     disableAnimations: props.disableAnimations,
     performance: props.performance,
-    renderer: props.renderer,
+    rtl: props.rtl,
     target: props.target,
     telemetry,
+    theme: props.theme,
   };
 
   const consumedContext: ProviderContextPrepared = React.useContext(ThemeContext);
   const incomingContext: ProviderContextInput | ProviderContextPrepared = overwrite ? {} : consumedContext;
+  const createRenderer = React.useContext(RendererContext);
 
-  const outgoingContext = mergeContexts(incomingContext, inputContext);
+  const outgoingContext = mergeContexts(createRenderer, incomingContext, inputContext);
 
   const rtlProps: { dir?: 'rtl' | 'ltr' } = {};
   // only add dir attribute for top level provider or when direction changes from parent to child
@@ -224,7 +224,6 @@ Provider.propTypes = {
     staticStyles: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.func])),
     animations: PropTypes.object,
   }),
-  renderer: PropTypes.object as PropTypes.Validator<Renderer>,
   rtl: PropTypes.bool,
   disableAnimations: PropTypes.bool,
   // Heads Up!

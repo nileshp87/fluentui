@@ -19,3 +19,5 @@ export type Renderer = {
 
   Provider: React.FC;
 };
+
+export type CreateRenderer = (target?: Document) => Renderer;

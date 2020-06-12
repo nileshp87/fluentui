@@ -1,4 +1,5 @@
-import { ComponentDesignProp, RendererParam } from '@fluentui/react-bindings';
+import { ComponentDesignProp } from '@fluentui/react-bindings';
+import { RendererParam } from '@fluentui/styles';
 import * as customPropTypes from '@fluentui/react-proptypes';
 // @ts-ignore
 import { ThemeContext } from 'react-fela';

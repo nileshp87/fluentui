@@ -1,3 +1,6 @@
+import { RendererParam } from '@fluentui/styles';
+import { IStyle, TPlugin } from 'fela';
+
 const animationProps = [
   'animation',
   'animationName',
@@ -19,9 +22,9 @@ const animationProps = [
  * tree.
  */
 export default () => {
-  const disableAnimations = (styles: Object, type?, renderer?, props?) => {
+  const disableAnimations = (styles: IStyle, type: string, renderer: RendererParam, props: RendererParam): IStyle => {
     if (props && props.disableAnimations && type === 'RULE') {
-      return Object.keys(styles).reduce((acc, cssPropertyName) => {
+      return Object.keys(styles).reduce((acc, cssPropertyName: keyof IStyle) => {
         const cssPropertyValue = styles[cssPropertyName];
 
         if (animationProps.indexOf(cssPropertyName) !== -1) {
@@ -41,5 +44,5 @@ export default () => {
     return styles;
   };
 
-  return disableAnimations;
+  return disableAnimations as TPlugin;
 };

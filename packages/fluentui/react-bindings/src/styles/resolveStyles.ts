@@ -7,13 +7,13 @@ import {
   ICSSInJSStyle,
   isDebugEnabled,
   mergeComponentStyles,
+  RendererParam,
   ThemePrepared,
   withDebugId,
 } from '@fluentui/styles';
 import cx from 'classnames';
 import * as _ from 'lodash';
 
-import { RendererParam } from '../renderer/types';
 import { ComponentSlotClasses, ResolveStylesOptions } from './types';
 
 export type ResolveStylesResult = {

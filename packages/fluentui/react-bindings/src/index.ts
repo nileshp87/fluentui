@@ -19,8 +19,7 @@ export { default as useStateManager } from './hooks/useStateManager';
 export { default as useStyles, defaultPerformanceFlags } from './hooks/useStyles';
 export { default as useUnhandledProps } from './hooks/useUnhandledProps';
 
-export { noopRenderer } from './renderer/noopRenderer';
-export * from './renderer/types';
+export { RendererContext } from './renderer/RendererContext';
 
 export { default as unstable_createAnimationStyles } from './styles/createAnimationStyles';
 export { default as unstable_calculateAnimationTimeout } from './styles/calculateAnimationTimeout';
